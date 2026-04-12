@@ -43,6 +43,13 @@ export function parseUnit(value: UnitValue | undefined, total: number, rootFontS
     return value;
   }
   const trimmed = value.trim();
+  const calcMatch = trimmed.match(/^calc\(\s*100%\s*-\s*(.+)\)$/i);
+  if (calcMatch) {
+    const inner = calcMatch[1]?.trim();
+    if (inner) {
+      return total - parseUnit(inner, total, rootFontSize);
+    }
+  }
   if (trimmed.endsWith('%')) {
     return (Number.parseFloat(trimmed) / 100) * total;
   }
@@ -109,14 +116,15 @@ function parseAnchorString(input: string): AnchorObject | null {
   if (leftIndex !== -1) {
     x = tokens[leftIndex + 1] ?? '0%';
   } else if (rightIndex !== -1) {
-    const next = tokens[rightIndex + 1];
-    x = next ?? '100%';
+    const next = tokens[rightIndex + 1] ?? '0';
+    x = `calc(100% - ${next})`;
   }
 
   if (topIndex !== -1) {
     y = tokens[topIndex + 1] ?? '0%';
   } else if (bottomIndex !== -1) {
-    y = tokens[bottomIndex + 1] ?? '100%';
+    const next = tokens[bottomIndex + 1] ?? '0';
+    y = `calc(100% - ${next})`;
   }
 
   if (tokens.length === 2 && !Number.isNaN(Number.parseFloat(tokens[0])) && !Number.isNaN(Number.parseFloat(tokens[1]))) {
