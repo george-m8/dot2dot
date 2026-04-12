@@ -18,6 +18,7 @@
   ],
   "scripts": {
     "build": "vite build && tsc -p tsconfig.build.json && node scripts/emit-types.mjs",
+    "build:netlify": "npm run build && npm run release:patch",
     "dev": "vite build --watch",
     "release:patch": "node scripts/release-version.mjs",
     "release:version": "node scripts/release-version.mjs",
